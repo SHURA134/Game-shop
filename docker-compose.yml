@@ -1,0 +1,17 @@
+version: '3.5'
+
+services:
+  postgres:
+    container_name: steam-service
+    image: postgres
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+networks:
+  postgres:
+    driver: bridge
