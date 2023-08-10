@@ -1,5 +1,5 @@
 const express = require('express');
-const {createUser,getUsers,logIn,dep} = require("../controllers/usersController");
+const {createUser,getUsers,logIn,dep,createTables, createGames,buyGame,showMyGame,addInWishList,showMyWishlist} = require("../controllers/usersController");
 const {authMiddleware} = require("../midlewares/midlewareSession.js");
 const usersRouter = express.Router();
 
@@ -9,14 +9,13 @@ const usersRouter = express.Router();
 
  */
 
-usersRouter.post("/", authMiddleware , async (req,res) => {
-    //const name=req.body.name;
-
-    //console.log( await createUser(name,log,password));
-    //console.log(await getUsers());
+usersRouter.post("/" , async (req,res) => {
+    await createTables();
+    await createGames();
+    res.send(await getUsers());
 })
 
-usersRouter.post('/autorization',async (request, response) => {
+usersRouter.post('/registration',async (request, response) => {
     const {name,login,password} = request.body;
     response.send(await createUser(name,login,password));
 });
@@ -38,16 +37,44 @@ usersRouter.post('/logout', (request, response) => {
     return response.status(200).send('logout')
 });
 
-usersRouter.post('/:deping',async (req,res) => {
+usersRouter.post('/show', authMiddleware , async (req,res) =>{
+    const {login} = req.body;
+    res.send(await showMyGame(login));
+})
+
+
+usersRouter.post('/:deping', authMiddleware , async (req,res) => {
     const {login} = req.body;
     const {deping}= req.params;
-    if (req.session[login]){
-        res.send(await dep(deping,login))
-        console.log('ya tut');
-    }else {
-        res.status(403).send(`you are not allowed to login`);
-    }
+
+    res.send(await dep(deping,login))
+
 })
+
+
+
+usersRouter.post('/buy/:gameId', authMiddleware , async (req,res) =>{
+    const {gameId}=req.params;
+    const {login} = req.body;
+
+    res.send(await buyGame(login,gameId));
+})
+
+usersRouter.post('/addWishList/:gameId', authMiddleware , async (req,res) =>{
+    const {gameId}=req.params;
+    const {login} = req.body;
+
+    res.send(await addInWishList(login,gameId));
+})
+
+usersRouter.post('/showWishList', authMiddleware , async (req,res) =>{
+    const {login} = req.body;
+
+    res.send(await showMyWishlist(login));
+})
+
+
+
 
 
 
