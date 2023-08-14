@@ -88,10 +88,13 @@ async function dep(plus,log){
 
 async function buyGame(log,id){
     try{
-        const {games_id,wallet}=await getUserLogined(log);
+        const {games_id,wallet,wish_list}=await getUserLogined(log);
 
         const {rows: gamesRows}=await client.query(`SELECT * FROM steam.games WHERE ID='${id}'`);
         const {price}=gamesRows[0];
+
+        const gameIndex=wish_list.indexOf(Number(id));
+        console.log(gameIndex);
 
         let change=wallet-price;
         if(change>=0){
@@ -102,6 +105,10 @@ async function buyGame(log,id){
                 await client.query(`UPDATE steam.users SET games_id = '{${games_id}}', wallet='${change}' WHERE login='${log}'`);
             }else{
                 console.log( "you already have this game");
+            }
+            if(gameIndex !== -1){
+                wish_list.splice(gameIndex,1);
+                await client.query(`UPDATE steam.users SET wish_list = '{${wish_list}}' WHERE login='${log}'`);
             }
         }else{
             console.log("not enough money. top up your account");
@@ -127,8 +134,7 @@ async function addInWishList(log,id){
         const {games_id,wish_list}=await getUserLogined(log);
         const valueGamesIds=games_id.includes(Number(id));
         const valueWishList=wish_list.includes(Number(id));
-        console.log(valueGamesIds);
-        console.log(valueWishList);
+
         if(valueWishList){
             console.log('this game is already on your wishlist');
         }else if(valueGamesIds){
@@ -137,7 +143,6 @@ async function addInWishList(log,id){
             wish_list.push(id);
             await client.query(`UPDATE steam.users SET wish_list = '{${wish_list}}'  WHERE login='${log}'`);
         }
-
     }catch(err) {
         throw new Error(`Error while register: ${err.message}`);
     }

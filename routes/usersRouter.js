@@ -3,11 +3,6 @@ const {createUser,getUsers,logIn,dep,createTables, createGames,buyGame,showMyGam
 const {authMiddleware} = require("../midlewares/midlewareSession.js");
 const usersRouter = express.Router();
 
-/*usersRouter.post("/", authMiddleware , async (req,res) => {
-    res.send('bez session');
-})
-
- */
 
 usersRouter.post("/" , async (req,res) => {
     await createTables();
@@ -42,8 +37,12 @@ usersRouter.post('/show', authMiddleware , async (req,res) =>{
     res.send(await showMyGame(login));
 })
 
+usersRouter.post('/showWishList', authMiddleware , async (req,res) =>{
+    const {login} = req.body;
 
-usersRouter.post('/:deping', authMiddleware , async (req,res) => {
+    res.send(await showMyWishlist(login));
+})
+usersRouter.post('/dep/:deping', authMiddleware , async (req,res) => {
     const {login} = req.body;
     const {deping}= req.params;
 
@@ -67,11 +66,6 @@ usersRouter.post('/addWishList/:gameId', authMiddleware , async (req,res) =>{
     res.send(await addInWishList(login,gameId));
 })
 
-usersRouter.post('/showWishList', authMiddleware , async (req,res) =>{
-    const {login} = req.body;
-
-    res.send(await showMyWishlist(login));
-})
 
 
 

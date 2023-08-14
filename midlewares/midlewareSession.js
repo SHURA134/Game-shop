@@ -1,5 +1,3 @@
-
-
 function authMiddleware(request, response, next) {
     const login = request.body.login;
     console.log("REQUETS", login);
