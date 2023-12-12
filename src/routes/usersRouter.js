@@ -1,12 +1,11 @@
 const express = require('express');
-const {createUser,getUsers,logIn,dep,createTables, createGames,buyGame,showMyGame,addInWishList,showMyWishlist} = require("../controllers/usersController");
+const {createUser,getUsers,logIn,dep,createTables,buyGame,showMyGame,addInWishList,showMyWishlist} = require("../controllers/usersController");
 const {authMiddleware} = require("../midlewares/midlewareSession.js");
-const usersRouter = express.Router();
 
+const usersRouter = express.Router();
 
 usersRouter.post("/" , async (req,res) => {
     await createTables();
-    await createGames();
     res.send(await getUsers());
 })
 
@@ -32,7 +31,7 @@ usersRouter.post('/logout', (request, response) => {
     return response.status(200).send('logout')
 });
 
-usersRouter.post('/show', authMiddleware , async (req,res) =>{
+usersRouter.post ('/show', authMiddleware , async (req,res) =>{
     const {login} = req.body;
     res.send(await showMyGame(login));
 })
@@ -42,6 +41,7 @@ usersRouter.post('/showWishList', authMiddleware , async (req,res) =>{
 
     res.send(await showMyWishlist(login));
 })
+
 usersRouter.post('/dep/:deping', authMiddleware , async (req,res) => {
     const {login} = req.body;
     const {deping}= req.params;
@@ -49,8 +49,6 @@ usersRouter.post('/dep/:deping', authMiddleware , async (req,res) => {
     res.send(await dep(deping,login))
 
 })
-
-
 
 usersRouter.post('/buy/:gameId', authMiddleware , async (req,res) =>{
     const {gameId}=req.params;
@@ -65,11 +63,5 @@ usersRouter.post('/addWishList/:gameId', authMiddleware , async (req,res) =>{
 
     res.send(await addInWishList(login,gameId));
 })
-
-
-
-
-
-
 
 module.exports={usersRouter};

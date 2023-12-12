@@ -9,8 +9,6 @@ function authMiddleware(request, response, next) {
         return response.status(401).send('unathorized, please login first');
     }
 
-
-
     next();
 }
 

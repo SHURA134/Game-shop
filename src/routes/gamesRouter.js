@@ -12,6 +12,7 @@ gamesRouter.post("/price/:sortParam", async (req,res)=>{
     const {sortParam}=req.params;
     res.send(await sortGames("price", sortParam));
 })
+
 gamesRouter.post("/:sortParam", async (req,res)=>{
     const {sortParam}=req.params;
     res.send(await sortGames("game", sortParam));

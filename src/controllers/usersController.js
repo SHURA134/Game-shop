@@ -1,8 +1,7 @@
-const {client}=require (`../modules/db.js`);
+const {client}=require (`../modules/db`);
 const bcrypt=require(`bcrypt`);
 
 const SALT_ROUNDS = 3;
-
 
 async function createTables() {
     await client.query(`CREATE TABLE IF NOT EXISTS steam.games (
@@ -24,33 +23,27 @@ async function createTables() {
                                     wish_list integer[100] DEFAULT '{}',
                                     PRIMARY KEY (ID)  )` );
 
-}
+    await client.query(`INSERT INTO steam.games (game,price,genre) VALUES ('witcher','20','RPG')`);
+    await client.query(`INSERT INTO steam.games (game,price,genre) VALUES ('hades','20','rogue')`);
+    await client.query(`INSERT INTO steam.games (game,price,genre) VALUES ('NFS: ubound','60','arcade')`);
 
+}
 
 async function getUsers() {
     const users=await client.query(`SELECT * FROM steam.users `);
     return users.rows;
 }
+
 async function getUserLogined(log) {
     const users=await client.query(`SELECT * FROM steam.users WHERE login='${log}'`);
     return users.rows[0];
 }
 
-
-
-async function createGames(){
-    await client.query(`SELECT * FROM steam.games`);
-    await client.query(`INSERT INTO steam.games (game,price,genre) VALUES ('witcher','20','RPG')`);
-    await client.query(`INSERT INTO steam.games (game,price,genre) VALUES ('hades','20','rogue')`);
-    await client.query(`INSERT INTO steam.games (game,price,genre) VALUES ('NFS: ubound','60','arcade')`);
-}
 async function createUser(name,log,pass){
     const users= await getUsers();
-
-
     const hashedPassword = await bcrypt.hash(pass, SALT_ROUNDS);
-
     const getLogin=users.find(item => item.login===log);
+
     if(!getLogin) {
         try {
             await client.query(`INSERT INTO steam.users (name, login, password, role) VALUES ('${name}', '${log}', '${hashedPassword}','user')`);
@@ -62,12 +55,11 @@ async function createUser(name,log,pass){
         return 'such a login already exists';
     }
 }
+
 async function logIn(log,pass){
     const user=await getUserLogined(log);
-
     return user.login===log && bcrypt.compare(pass, user.password);
 }
-
 
 async function dep(plus,log){
     let {wallet}=await getUserLogined(log);
@@ -80,11 +72,8 @@ async function dep(plus,log){
     }catch(err) {
             throw new Error(`Error while register: ${err.message}`);
         }
-        
     return await getUserLogined(log);
 }
-
-
 
 async function buyGame(log,id){
     try{
@@ -119,6 +108,7 @@ async function buyGame(log,id){
     }
 
 }
+
 async function showMyGame(log){
     try {
         const {games_id} = await getUserLogined(log);
@@ -148,6 +138,7 @@ async function addInWishList(log,id){
     }
 
 }
+
 async function showMyWishlist(log){
     try {
         const {wish_list} = await getUserLogined(log);
@@ -158,9 +149,7 @@ async function showMyWishlist(log){
     }
 }
 
-
-
-module.exports={getUsers,createUser,logIn,dep,createTables,createGames,buyGame,showMyGame,addInWishList,showMyWishlist};
+module.exports={getUsers,createUser,logIn,dep,createTables,buyGame,showMyGame,addInWishList,showMyWishlist};
 
 
 
